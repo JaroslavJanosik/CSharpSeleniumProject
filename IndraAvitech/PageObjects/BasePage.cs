@@ -1,6 +1,6 @@
-﻿using ArtinTestProject;
+﻿using SendEmailProject.Framework;
 
-namespace IndraAvitech.PageObjects
+namespace SendEmailProject.PageObjects
 {
     class BasePage
     {

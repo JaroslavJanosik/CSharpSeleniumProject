@@ -1,35 +1,38 @@
-﻿using ArtinTestProject;
-using IndraAvitech.PageObjects;
-using NUnit.Framework;
-using IndraAvitech.Framework;
+﻿using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
-namespace IndraAvitech.Tests
+namespace SendEmailProject.Framework
 {
     public class BaseTest
     {
-        TestConfiguration _testConfiguration;
+        protected TestConfiguration _testConfiguration;
         protected Driver _driver;
-        LoginPage _loginPage;
-        HomePage _homePage;
-        protected string recipient;
+        protected GmailClient _gmailClient;
+        protected string _recipient;
 
         [SetUp]
-        public void Open()
+        public void SetUp()
         {
+            ExtentReporting.CreateTest(TestContext.CurrentContext.Test.MethodName);
             _testConfiguration = TestConfigHelper.AddConfig("appsettings.json");
-            recipient = _testConfiguration.RecipientEmail;
-            _driver = new Driver(_testConfiguration);            
-            _driver.GoTo(_testConfiguration.BaseUrl);
-            _loginPage = new LoginPage(_driver);
-            _homePage = new HomePage(_driver);
-            _loginPage.LoginToEmail(_testConfiguration.Username, _testConfiguration.Password);
+            _recipient = _testConfiguration.RecipientEmail;
+            _driver = new Driver(_testConfiguration);
+            _gmailClient = new GmailClient(_testConfiguration.RecipientClientID, _testConfiguration.RecipientClientSecret);
         }
 
         [TearDown]
-        public void Close()
+        public void TearDown()
         {
-            _homePage.LogOut();
-            Assert.AreEqual(_testConfiguration.BaseUrl, _driver.Url);
+            var testStatus = TestContext.CurrentContext.Result.Outcome.Status;
+            var message = TestContext.CurrentContext.Result.Message;
+
+            if (testStatus == TestStatus.Failed)
+            {
+                var screenShot = ExtentReporting.TakeScreenshot(_driver);
+                ExtentReporting.LogFail(message, screenShot);
+            }
+
+            ExtentReporting.EndReporting();
             _driver.Destroy();
         }
     }

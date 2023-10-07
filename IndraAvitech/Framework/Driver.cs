@@ -1,11 +1,15 @@
-﻿using IndraAvitech.Framework;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using System;
+using System.Collections.Generic;
+using WebDriverManager;
+using WebDriverManager.DriverConfigs.Impl;
 
-namespace ArtinTestProject
+namespace SendEmailProject.Framework
 {
     public class Driver
     {
@@ -16,26 +20,32 @@ namespace ArtinTestProject
         public Driver(TestConfiguration driverConfiguration)
         {
             _testConfiguration = driverConfiguration;
-            InitDriver(_testConfiguration.BrowserType);            
-        }        
+            InitDriver(_testConfiguration.BrowserType);
+        }
 
         private void InitDriver(string browser)
         {
             switch (browser.ToLower())
             {
                 case "chrome":
-                    _driver = new ChromeDriver(_testConfiguration.ChromeDriverPath);
+                    new DriverManager().SetUpDriver(new ChromeConfig());
+                    _driver = new ChromeDriver();
                     break;
                 case "firefox":
-                    _driver = new FirefoxDriver(_testConfiguration.FirefoxDriverPath);
+                    new DriverManager().SetUpDriver(new FirefoxConfig());
+                    _driver = new FirefoxDriver();
+                    break;
+                case "edge":
+                    new DriverManager().SetUpDriver(new EdgeConfig());
+                    _driver = new EdgeDriver();
                     break;
                 default:
                     throw new WebDriverException($"Problem with initializing driver for: {browser} browser");
             }
 
-            _wait = new WebDriverWait(Current, TimeSpan.FromSeconds(_testConfiguration.DefaultWaitTime));            
+            _wait = new WebDriverWait(Current, TimeSpan.FromSeconds(_testConfiguration.DefaultWaitTime));
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(_testConfiguration.DefaultWaitTime);
-            MaximizeBrowser();           
+            MaximizeBrowser();
         }
 
         public IWebDriver Current => _driver ?? throw new NullReferenceException("_driver is Null");
@@ -43,7 +53,7 @@ namespace ArtinTestProject
 
         public string Url => Current.Url;
         public string Title => Current.Title;
-        
+
         public void GoTo(string url)
         {
             Current.Navigate().GoToUrl(url);
@@ -63,15 +73,30 @@ namespace ArtinTestProject
         {
             Current.Quit();
         }
-        
+
         public Element FindElement(By by)
-        {           
-            return new Element(this, Current.FindElement(by), by);
+        {
+            IWebElement nativeElement = _wait.Until(ExpectedConditions.ElementExists(by));
+            Element element = new (this, nativeElement, by);
+            return element;
         }
 
         public Elements FindElements(By by)
         {
-            return new Elements(this, Current.FindElements(by), by);
+            IList<IWebElement> nativeElements = _wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(by));
+            Elements elements = new (this, nativeElements, by);
+            return elements;
+        }
+
+        public Element FindShadowDomElement(ISearchContext shadowRoot, By by)
+        {
+            return new Element(this, shadowRoot.FindElement(by), by);
+        }
+
+        public Elements FindShadowDomElements(ISearchContext shadowRoot, By by)
+        {     
+            IList<IWebElement> nativeElements = shadowRoot.FindElements(by);
+            return new Elements(this, nativeElements, by);
         }
     }
 }
