@@ -1,4 +1,6 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using System;
 using System.Drawing;
 using System.Threading;
@@ -29,11 +31,18 @@ namespace SendEmailProject.Framework
         public bool Enabled => Current.Enabled;
         public Point Location => Current.Location;
         public Size Size => Current.Size;
+        public string GetAttribute(string attributeName) => Current.GetAttribute(attributeName);
+
+        public Element FindElement(By by)
+        {
+            return new Element(_driver, _element.FindElement(by), by);
+        }
 
         public void Click(ISearchContext shadowRoot = null)
         {
             try
             {
+                WaitToBeClickable(_element);
                 ExtentReporting.LogInfo($"Click on element found {FoundBy}");
                 Current.Click();
             }
@@ -58,6 +67,12 @@ namespace SendEmailProject.Framework
             Current.Clear();
             ExtentReporting.LogInfo($"Enter text into the element found {FoundBy}");
             Current.SendKeys(text);
+        }
+
+        public void WaitToBeClickable(IWebElement element, int timeouInSecs = 20)
+        {
+            WebDriverWait wait = new (_driver.Current, TimeSpan.FromSeconds(timeouInSecs));
+            wait.Until(ExpectedConditions.ElementToBeClickable(element));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace SendEmailProject.Framework
 {
     public class Driver
     {
-        private TestConfiguration _testConfiguration;
+        private readonly TestConfiguration _testConfiguration;
         private IWebDriver _driver;
         private WebDriverWait _wait;
 
@@ -77,15 +77,13 @@ namespace SendEmailProject.Framework
         public Element FindElement(By by)
         {
             IWebElement nativeElement = _wait.Until(ExpectedConditions.ElementExists(by));
-            Element element = new (this, nativeElement, by);
-            return element;
+            return new Element(this, nativeElement, by);
         }
 
         public Elements FindElements(By by)
         {
             IList<IWebElement> nativeElements = _wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(by));
-            Elements elements = new (this, nativeElements, by);
-            return elements;
+            return new Elements(this, nativeElements, by);
         }
 
         public Element FindShadowDomElement(ISearchContext shadowRoot, By by)
