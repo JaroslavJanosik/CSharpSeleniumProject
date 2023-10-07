@@ -11,7 +11,7 @@ namespace SendEmailProject.Tests
     {
         private HomePage _homePage;
         private LoginPage _loginPage;
-        private readonly string emailSubject = "Test Email " + DateTime.UtcNow.ToString("yyyymmddhhmmss");
+        private readonly string emailSubject = $"Test Email {DateTime.UtcNow:yyyymmddhhmmss}";
         private readonly string fileUploadPath = Path.GetFullPath("TestData\\attachment.txt");
         private readonly string emailBody = "Hi,\n\nthis is a test email.\n\nKind Regards\n\nJaroslav";
 
