@@ -1,11 +1,10 @@
-﻿using ArtinTestProject;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace IndraAvitech.Framework
+namespace SendEmailProject.Framework
 {
     public class Elements : ReadOnlyCollection<Element>
     {

@@ -1,9 +1,9 @@
-﻿using ArtinTestProject;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using System;
 using System.Drawing;
+using System.Threading;
 
-namespace IndraAvitech.Framework
+namespace SendEmailProject.Framework
 {
     public class Element
     {
@@ -30,35 +30,33 @@ namespace IndraAvitech.Framework
         public Point Location => Current.Location;
         public Size Size => Current.Size;
 
-        public Element FindElement(By by)
-        {            
-            return new Element(Driver, Current.FindElement(by), by);
-        }
-
-        public Elements FindElements(By by)
+        public void Click(ISearchContext shadowRoot = null)
         {
-            return new Elements(Driver, Current.FindElements(by), by);
-        }
-
-        public void Click()
-        {
-            for (int i = 0; i < 3; i++)
+            try
             {
-                try
-                {                    
-                    Current.Click();
-                    break;
-                }
-                catch (WebDriverException e)
+                ExtentReporting.LogInfo($"Click on element found {FoundBy}");
+                Current.Click();
+            }
+            catch (WebDriverException exc)
+            {
+                ExtentReporting.LogInfo($"Exception caught while clicking on element:\n{exc.Message}");
+                if (shadowRoot != null)
                 {
-                    // do nothing
+                    ExtentReporting.LogInfo($"Click on element found {FoundBy}");
+                    shadowRoot.FindElement(FoundBy).Click();
+                } else
+                {
+                    ExtentReporting.LogInfo($"Click on element found {FoundBy}");
+                    _driver.Current.FindElement(FoundBy).Click();
                 }
-            }            
+            }
         }
 
         public void SendKeys(string text)
-        {            
+        {
+            Thread.Sleep(500);
             Current.Clear();
+            ExtentReporting.LogInfo($"Enter text into the element found {FoundBy}");
             Current.SendKeys(text);
         }
     }

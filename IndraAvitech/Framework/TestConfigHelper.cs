@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 
-namespace IndraAvitech.Framework
+namespace SendEmailProject.Framework
 {
     public static class TestConfigHelper
     {
@@ -9,9 +9,9 @@ namespace IndraAvitech.Framework
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile(path).Build();        
+                .AddJsonFile(path).Build();
 
             return config.Get<TestConfiguration>();
-        }      
-    }   
+        }
+    }
 }
