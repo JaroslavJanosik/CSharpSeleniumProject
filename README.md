@@ -4,7 +4,7 @@ Simple Automation Framework based on C#, NUnit and Selenium WebDriver.
 - clone the repository to your workspace
 - open the project (SendEmailProject.sln) in a compatible IDE, such as Microsoft Visual Studio or Rider
 - download the project dependencies
-- set a BrowserType in the appsetting.json file
+- set a BrowserType in the appsettings.json file
 - build the solution
 - run the tests using Test Explorer
 
